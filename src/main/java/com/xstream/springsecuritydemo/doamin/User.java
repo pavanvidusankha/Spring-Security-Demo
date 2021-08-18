@@ -13,7 +13,7 @@ import java.util.Collection;
 
 import static javax.persistence.FetchType.EAGER;
 
-@Entity @Data @NoArgsConstructor @AllArgsConstructor
+@Entity(name="users") @Data @NoArgsConstructor @AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
