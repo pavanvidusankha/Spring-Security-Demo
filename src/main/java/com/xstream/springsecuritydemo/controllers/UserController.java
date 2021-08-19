@@ -1,6 +1,7 @@
 package com.xstream.springsecuritydemo.controllers;
 
 import com.xstream.springsecuritydemo.doamin.Role;
+import com.xstream.springsecuritydemo.doamin.RoleUserDTO;
 import com.xstream.springsecuritydemo.doamin.User;
 import com.xstream.springsecuritydemo.services.interfaces.UserService;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/security")
-public class userController {
+public class UserController {
     private final UserService userService;
 
     @GetMapping("/users")
@@ -46,9 +47,4 @@ public class userController {
 
 }
 
-@Data
-class RoleUserDTO {
-    private String username;
-    private String roleName;
 
-}

@@ -10,20 +10,30 @@ import com.xstream.springsecuritydemo.repositories.UserRepository;
 import com.xstream.springsecuritydemo.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 @Service @RequiredArgsConstructor @Transactional @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public User saveUser(User user) {
         try {
             userRepository.save(user);
+            //save encrypted password
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }catch (IllegalStateException e){
             log.info("Error occurred when saving user");
             throw new UserServiceException();
@@ -61,7 +71,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(String username) {
-        if(username.isEmpty() || username.length()==0){
+        if(username.isEmpty()){
             throw  new InvalidParameterException();
         }
         User user;
@@ -93,4 +103,22 @@ public class UserServiceImpl implements UserService {
         return usersList;
 
     }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user;
+        try{
+             user=userRepository.findUserByUsername(username);
+
+        }catch (UsernameNotFoundException e){
+            log.error("User with name "+username+"is not found");
+            throw new UsernameNotFoundException("User with name "+username+"is not found");
+        }catch (Exception e){
+            throw new UserServiceException();
+        }
+        Collection<SimpleGrantedAuthority> authorities=new ArrayList<>();
+        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+        return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(),authorities);
+    }
+
 }
