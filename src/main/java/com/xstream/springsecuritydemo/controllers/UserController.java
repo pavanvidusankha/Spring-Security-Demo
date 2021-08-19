@@ -1,16 +1,21 @@
 package com.xstream.springsecuritydemo.controllers;
 
+import com.xstream.springsecuritydemo.config.SecurityConfig;
 import com.xstream.springsecuritydemo.doamin.Role;
 import com.xstream.springsecuritydemo.doamin.RoleUserDTO;
 import com.xstream.springsecuritydemo.doamin.User;
 import com.xstream.springsecuritydemo.services.interfaces.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -19,6 +24,7 @@ import java.util.List;
 @RequestMapping("/security")
 public class UserController {
     private final UserService userService;
+    private final SecurityConfig securityConfig;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -39,10 +45,15 @@ public class UserController {
         return new ResponseEntity<>(userService.saveRole(role), HttpStatus.CREATED);
     }
 
-    @PostMapping("users/roles")
+    @PostMapping("/users/roles")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleUserDTO dtoObj) {
         userService.addRoleToUser(dtoObj.getUsername(), dtoObj.getRoleName());
         return new ResponseEntity<>("Added Roles to the user " + dtoObj.getUsername(), HttpStatus.OK);
+    }
+
+    @GetMapping("/tokens")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+                securityConfig.refreshToken(request,response);
     }
 
 }

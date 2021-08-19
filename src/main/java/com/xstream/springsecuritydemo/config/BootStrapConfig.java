@@ -26,6 +26,7 @@ public class BootStrapConfig {
 
             //adding roles to the users
             userService.addRoleToUser("psam","ADMIN");
+            userService.addRoleToUser("psam","USER");
             userService.addRoleToUser("jdoe","USER");
 
 
