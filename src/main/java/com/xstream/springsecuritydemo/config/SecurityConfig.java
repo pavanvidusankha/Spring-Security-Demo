@@ -44,6 +44,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean () throws Exception{
+        return super.authenticationManagerBean();
+    }
+
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
@@ -67,11 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean () throws Exception{
-        return super.authenticationManagerBean();
-    }
+
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String authorizationHeader = request.getHeader(AUTHORIZATION);
